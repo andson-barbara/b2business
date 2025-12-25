@@ -9,17 +9,22 @@ export const envValidationSchema = Joi.object({
   DB_USER: Joi.string().required(),
   DB_NAME: Joi.string().required(),
 
-  // Aceita os dois (pra compatibilidade), mas exige pelo menos um
-  DB_PASS: Joi.string().optional(),
-  DB_PASSWORD: Joi.string().optional(),
+  DB_PASS: Joi.string().min(1).optional(),
+  DB_PASSWORD: Joi.string().min(1).optional(),
 
   JWT_SECRET: Joi.string().min(16).required(),
   JWT_EXPIRES_IN: Joi.string().default('7d'),
 
   APP_URL: Joi.string().uri().optional(),
-}).custom((value, helpers) => {
-  if (!value.DB_PASS && !value.DB_PASSWORD) {
-    return helpers.error('any.custom', { message: 'DB_PASS ou DB_PASSWORD é obrigatório' });
-  }
-  return value;
-}, 'DB password validation');
+})
+  .custom((value, helpers) => {
+    const pass = value.DB_PASSWORD ?? value.DB_PASS;
+    if (!pass || typeof pass !== 'string' || pass.trim().length === 0) {
+      // ✅ compatível com TS/Joi sem briga de tipos
+      return helpers.error('any.custom', { message: 'DB_PASS ou DB_PASSWORD deve estar preenchido' });
+    }
+    return value;
+  }, 'DB password validation')
+  .messages({
+    'any.custom': '{{#message}}',
+  });
