@@ -42,7 +42,7 @@ function toStr(value: unknown): string {
           host: toStr(process.env.DB_HOST),
           port: Number(process.env.DB_PORT),
           username: toStr(process.env.DB_USER),
-          password, // ✅ string garantida
+          password, 
           database: toStr(process.env.DB_NAME),
 
           autoLoadEntities: true,
