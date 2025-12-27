@@ -45,10 +45,7 @@ export class WebhooksController {
     const sig = toStr(signature);
 
     const rawBody = req.rawBody?.toString('utf8') ?? '';
-
-    if (!rawBody) {
-      throw new UnauthorizedException('rawBody ausente');
-    }
+    if (!rawBody) throw new UnauthorizedException('rawBody ausente');
 
     if (!verifySignature(rawBody, secret, sig)) {
       throw new UnauthorizedException('Assinatura inválida');

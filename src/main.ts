@@ -2,14 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 
-// ✅ estilo compatível quando esModuleInterop = false
 import express = require('express');
 import bodyParser = require('body-parser');
 
 async function bootstrap() {
   const server = express();
 
-  // ✅ captura o raw body REAL antes do Nest consumir o body
+  // Captura o body bruto ANTES do Nest consumir/parsing
   server.use(
     bodyParser.json({
       verify: (req: any, _res: any, buf: Buffer) => {
@@ -21,6 +20,10 @@ async function bootstrap() {
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(server),
+    {
+      // ✅ essencial: impede o Nest de registrar outro body parser
+      bodyParser: false,
+    },
   );
 
   app.enableCors({
