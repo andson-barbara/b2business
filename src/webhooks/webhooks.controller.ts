@@ -43,9 +43,14 @@ export class WebhooksController {
     if (!secret) throw new UnauthorizedException('N8N_WEBHOOK_SECRET não configurado');
 
     const sig = toStr(signature);
-    const rawBody = (req.rawBody ?? Buffer.from('')).toString('utf8');
 
-    if (!rawBody || !sig || !verifySignature(rawBody, secret, sig)) {
+    const rawBody = req.rawBody?.toString('utf8') ?? '';
+
+    if (!rawBody) {
+      throw new UnauthorizedException('rawBody ausente');
+    }
+
+    if (!verifySignature(rawBody, secret, sig)) {
       throw new UnauthorizedException('Assinatura inválida');
     }
 
